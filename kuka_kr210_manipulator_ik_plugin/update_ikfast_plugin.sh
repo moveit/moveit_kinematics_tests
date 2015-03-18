@@ -1,0 +1,1 @@
+rosrun moveit_ikfast create_ikfast_moveit_plugin.py kuka_kr210 manipulator kuka_kr210_manipulator_ik_plugin /home/ros-devel/ros/indigo/moveit_core_ws/src/descartes_moveit_test/kuka_kr210_manipulator_ik_plugin/src/kuka_kr210_manipulator_ikfast_solver.cpp
