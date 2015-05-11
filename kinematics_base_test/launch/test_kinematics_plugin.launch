@@ -5,14 +5,6 @@
     <arg name="load_robot_description" value="true"/>
   </include>
 
-  <test test-name="ikfast_test" pkg="kinematics_base_test" type="kinematics_base_test_utest" name="kinematics_test" time-limit="180" >
-    <param name="tip_link" value="tool0" />
-    <param name="root_link" value="base_link" />
-    <param name="group" value="manipulator" />
-    <param name="number_fk_tests" value="100" />
-    <param name="number_ik_tests" value="100" />
-    <param name="number_fk_tests_with_callbacks" value="100" />
-    <param name="ik_plugin_name" value="kuka_kr210_manipulator_kinematics/IKFastKinematicsPlugin" />
-    <rosparam param="joint_names">[joint_1, joint_2, joint_3, joint_4, joint_5, joint_6 ]</rosparam>
-  </test>
+ <include file="$(find kinematics_base_test)/launch/test_ikfast_plugin.launch" />
+ <include file="$(find kinematics_base_test)/launch/test_kdl_plugin.launch" />
 </launch>

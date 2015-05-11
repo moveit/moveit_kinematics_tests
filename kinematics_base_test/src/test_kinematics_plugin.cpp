@@ -21,9 +21,10 @@ const std::string TIP_LINK_PARAM = "tip_link";
 const std::string ROOT_LINK_PARAM = "root_link";
 const std::string ROBOT_DESCRIPTION_PARAM = "robot_description";
 const std::string JOINT_NAMES_PARAM = "joint_names";
-const unsigned int NUM_FK_TEST = 100;
-const unsigned int NUM_FK_TEST_CB = 100;
-const unsigned int NUM_IK_TEST = 100;
+const std::string NUM_FK_TESTS = "num_fk_tests";
+const std::string NUM_IK_CB_TESTS = "num_ik_cb_tests";
+const std::string NUM_IK_TESTS = "num_ik_tests";
+const std::string NUM_IK_MULTIPLE_TESTS = "num_ik_multiple_tests";
 const double DEFAULT_SEARCH_DISCRETIZATION = 0.01f;
 
 class KinematicsTest
@@ -81,6 +82,20 @@ public:
       return false;
     }
 
+    // loading test details parameters
+    if(ph.getParam(NUM_FK_TESTS,num_fk_tests_) &&
+        ph.getParam(NUM_IK_CB_TESTS,num_ik_cb_tests_) &&
+        ph.getParam(NUM_IK_TESTS,num_ik_tests_) &&
+        ph.getParam(NUM_IK_MULTIPLE_TESTS,num_ik_multiple_tests_))
+    {
+      ROS_INFO_STREAM("Loaded test parameters");
+    }
+    else
+    {
+      ROS_ERROR_STREAM("Failed to load test parameters");
+      EXPECT_TRUE(false);
+    }
+
     return true;
   }
 
@@ -114,6 +129,10 @@ public:
   std::string tip_link_;
   std::string group_name_;
   std::vector<std::string> joints_;
+  int num_fk_tests_;
+  int num_ik_cb_tests_;
+  int num_ik_tests_;
+  int num_ik_multiple_tests_;
 };
 
 KinematicsTest kinematics_test;
@@ -159,7 +178,9 @@ TEST(IKFastPlugin, getFK)
   robot_state::RobotState kinematic_state(kinematic_model);
 
   bool succeeded;
-  for(unsigned int i=0; i < NUM_FK_TEST; ++i)
+  int success = 0;
+  ros::WallTime start_time = ros::WallTime::now();
+  for(unsigned int i=0; i < kinematics_test.num_fk_tests_; ++i)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
@@ -168,10 +189,15 @@ TEST(IKFastPlugin, getFK)
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
     succeeded = kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
-    ASSERT_TRUE(succeeded);
-    ASSERT_TRUE(poses.size() == 1);
-
+    if(succeeded && (poses.size() == 1))
+    {
+      success++;
+    }
   }
+
+  ROS_INFO_STREAM("Success Rate: "<<(double)success/kinematics_test.num_fk_tests_);
+  EXPECT_GT(success , 0.99 * kinematics_test.num_fk_tests_);
+  ROS_INFO_STREAM("Elapsed time: "<< (ros::WallTime::now()-start_time).toSec());
 }
 
 
@@ -195,7 +221,7 @@ TEST(IKFastPlugin, searchIK)
 
   unsigned int success = 0;
   ros::WallTime start_time = ros::WallTime::now();
-  for(unsigned int i=0; i < NUM_IK_TEST; ++i)
+  for(unsigned int i=0; i < kinematics_test.num_ik_tests_; ++i)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
@@ -207,7 +233,7 @@ TEST(IKFastPlugin, searchIK)
     bool result_fk = kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
     ASSERT_TRUE(result_fk);
     solution.clear();
-    EXPECT_TRUE(kinematics_test.kinematics_solver_->searchPositionIK(poses[0], seed, timeout, solution, error_code));
+    kinematics_test.kinematics_solver_->searchPositionIK(poses[0], seed, timeout, solution, error_code);
     bool result = error_code.val == error_code.SUCCESS;
 
     ROS_DEBUG("Pose: %f %f %f",poses[0].position.x, poses[0].position.y, poses[0].position.z);
@@ -242,8 +268,8 @@ TEST(IKFastPlugin, searchIK)
   }
 
 
-  ROS_INFO_STREAM("Success Rate: "<<(double)success/NUM_IK_TEST);
-  EXPECT_GT(success , 0.99 * NUM_IK_TEST);
+  ROS_INFO_STREAM("Success Rate: "<<(double)success/kinematics_test.num_ik_tests_);
+  EXPECT_GT(success , 0.99 * kinematics_test.num_ik_tests_);
   ROS_INFO_STREAM("Elapsed time: "<< (ros::WallTime::now()-start_time).toSec());
 }
 
@@ -267,7 +293,7 @@ TEST(IKFastPlugin, searchIKWithCallback)
 
   unsigned int success = 0;
   ros::WallTime start_time = ros::WallTime::now();
-  for(unsigned int i=0; i < NUM_IK_TEST; ++i)
+  for(unsigned int i=0; i < kinematics_test.num_ik_cb_tests_; ++i)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
@@ -286,9 +312,9 @@ TEST(IKFastPlugin, searchIKWithCallback)
     }
 
     solution.clear();
-    EXPECT_TRUE(kinematics_test.kinematics_solver_->searchPositionIK(poses[0], fk_values, timeout, solution,
+    kinematics_test.kinematics_solver_->searchPositionIK(poses[0], fk_values, timeout, solution,
                                                                  boost::bind(&KinematicsTest::searchIKCallback,&kinematics_test,
-                                                                             _1,_2,_3),error_code));
+                                                                             _1,_2,_3),error_code);
     bool result = error_code.val == error_code.SUCCESS;
 
     ROS_DEBUG("Pose: %f %f %f",poses[0].position.x, poses[0].position.y, poses[0].position.z);
@@ -323,8 +349,8 @@ TEST(IKFastPlugin, searchIKWithCallback)
   }
 
 
-  ROS_INFO_STREAM("Success Rate: "<<(double)success/NUM_IK_TEST);
-  EXPECT_GT(success , 0.99 * NUM_IK_TEST);
+  ROS_INFO_STREAM("Success Rate: "<<(double)success/kinematics_test.num_ik_cb_tests_);
+  EXPECT_GT(success , 0.99 * kinematics_test.num_ik_cb_tests_);
   ROS_INFO_STREAM("Elapsed time: "<< (ros::WallTime::now()-start_time).toSec());
 }
 
@@ -349,7 +375,7 @@ TEST(IKFastPlugin, getIK)
 
   unsigned int success = 0;
   ros::WallTime start_time = ros::WallTime::now();
-  for(unsigned int i=0; i < NUM_IK_TEST; ++i)
+  for(unsigned int i=0; i < kinematics_test.num_ik_tests_; ++i)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
@@ -362,7 +388,7 @@ TEST(IKFastPlugin, getIK)
     ASSERT_TRUE(result_fk);
     solution.clear();
 
-    EXPECT_TRUE(kinematics_test.kinematics_solver_->getPositionIK(poses[0], fk_values, solution, error_code));
+    kinematics_test.kinematics_solver_->getPositionIK(poses[0], fk_values, solution, error_code);
     ROS_DEBUG("Pose: %f %f %f",poses[0].position.x, poses[0].position.y, poses[0].position.z);
     ROS_DEBUG("Orient: %f %f %f %f",poses[0].orientation.x, poses[0].orientation.y, poses[0].orientation.z, poses[0].orientation.w);
 
@@ -389,8 +415,8 @@ TEST(IKFastPlugin, getIK)
   }
 
 
-  ROS_INFO_STREAM("Success Rate: "<<(double)success/NUM_IK_TEST);
-  EXPECT_GT(success , 0.99 * NUM_IK_TEST);
+  ROS_INFO_STREAM("Success Rate: "<<(double)success/kinematics_test.num_ik_tests_);
+  EXPECT_GT(success , 0.99 * kinematics_test.num_ik_tests_);
   ROS_INFO_STREAM("Elapsed time: "<< (ros::WallTime::now()-start_time).toSec());
 }
 
@@ -416,7 +442,7 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
 
   unsigned int success = 0;
   ros::WallTime start_time = ros::WallTime::now();
-  for(unsigned int i=0; i < NUM_IK_TEST; ++i)
+  for(unsigned int i=0; i < kinematics_test.num_ik_multiple_tests_; ++i)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
@@ -428,7 +454,7 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
     ASSERT_TRUE(kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses));
 
     solutions.clear();
-    EXPECT_TRUE(kinematics_test.kinematics_solver_->getPositionIK(poses, solutions, result,options));
+    kinematics_test.kinematics_solver_->getPositionIK(poses, solutions, result,options);
     ROS_DEBUG("Pose: %f %f %f",poses[0].position.x, poses[0].position.y, poses[0].position.z);
     ROS_DEBUG("Orient: %f %f %f %f",poses[0].orientation.x, poses[0].orientation.y, poses[0].orientation.z, poses[0].orientation.w);
 
@@ -463,8 +489,8 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
   }
 
 
-  ROS_INFO_STREAM("Success Rate: "<<(double)success/NUM_IK_TEST);
-  EXPECT_GT(success , 0.99 * NUM_IK_TEST);
+  ROS_INFO_STREAM("Success Rate: "<<(double)success/kinematics_test.num_ik_multiple_tests_);
+  EXPECT_GT(success , 0.99 * kinematics_test.num_ik_multiple_tests_);
   ROS_INFO_STREAM("Elapsed time: "<< (ros::WallTime::now()-start_time).toSec());
 }
 
@@ -474,6 +500,6 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
 int main(int argc, char **argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  ros::init (argc, argv, "ikfast_plugin_test");
+  ros::init (argc, argv, "kinematics_plugin_test");
   return RUN_ALL_TESTS();
 }
