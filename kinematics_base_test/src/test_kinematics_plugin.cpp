@@ -26,7 +26,7 @@ const unsigned int NUM_FK_TEST_CB = 100;
 const unsigned int NUM_IK_TEST = 100;
 const double DEFAULT_SEARCH_DISCRETIZATION = 0.01f;
 
-class IKFastTest
+class KinematicsTest
 {
 public:
 
@@ -116,21 +116,21 @@ public:
   std::vector<std::string> joints_;
 };
 
-IKFastTest ikfast_test;
+KinematicsTest kinematics_test;
 
 TEST(IKFastPlugin, initialize)
 {
-  EXPECT_TRUE(ikfast_test.initialize());
+  EXPECT_TRUE(kinematics_test.initialize());
 
   // Test getting chain information
-  EXPECT_TRUE(ikfast_test.root_link_ == ikfast_test.kinematics_solver_->getBaseFrame());
-  EXPECT_TRUE(ikfast_test.tip_link_ == ikfast_test.kinematics_solver_->getTipFrame());
-  std::vector<std::string> joint_names = ikfast_test.kinematics_solver_->getJointNames();
-  EXPECT_EQ((int)joint_names.size(), ikfast_test.joints_.size());
+  EXPECT_TRUE(kinematics_test.root_link_ == kinematics_test.kinematics_solver_->getBaseFrame());
+  EXPECT_TRUE(kinematics_test.tip_link_ == kinematics_test.kinematics_solver_->getTipFrame());
+  std::vector<std::string> joint_names = kinematics_test.kinematics_solver_->getJointNames();
+  EXPECT_EQ((int)joint_names.size(), kinematics_test.joints_.size());
 
   for(unsigned int i = 0;i < joint_names.size();i++)
   {
-    if(joint_names[i]!=ikfast_test.joints_[i])
+    if(joint_names[i]!=kinematics_test.joints_[i])
     {
       ROS_ERROR_STREAM("Joint names differ");
       EXPECT_TRUE(false);
@@ -150,24 +150,24 @@ TEST(IKFastPlugin, getFK)
   kinematic_model.reset(new robot_model::RobotModel(urdf_model, srdf));
 
   // fk solution setup
-  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(ikfast_test.kinematics_solver_->getGroupName());
+  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(kinematics_test.kinematics_solver_->getGroupName());
   std::vector<double> seed, fk_values, solution;
   moveit_msgs::MoveItErrorCodes error_code;
-  solution.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+  solution.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
   std::vector<std::string> fk_names;
-  fk_names.push_back(ikfast_test.kinematics_solver_->getTipFrame());
+  fk_names.push_back(kinematics_test.kinematics_solver_->getTipFrame());
   robot_state::RobotState kinematic_state(kinematic_model);
 
   bool succeeded;
   for(unsigned int i=0; i < NUM_FK_TEST; ++i)
   {
-    seed.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
-    fk_values.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+    seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
+    fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     kinematic_state.setToRandomPositions(joint_model_group);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
-    succeeded = ikfast_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
+    succeeded = kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
     ASSERT_TRUE(succeeded);
     ASSERT_TRUE(poses.size() == 1);
 
@@ -182,32 +182,32 @@ TEST(IKFastPlugin, searchIK)
   const boost::shared_ptr<srdf::Model> &srdf_model = rdf_loader_.getSRDF();
   const boost::shared_ptr<urdf::ModelInterface>& urdf_model = rdf_loader_.getURDF();
   kinematic_model.reset(new robot_model::RobotModel(urdf_model, srdf_model));
-  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(ikfast_test.kinematics_solver_->getGroupName());
+  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(kinematics_test.kinematics_solver_->getGroupName());
 
   //Test inverse kinematics
   std::vector<double> seed, fk_values, solution;
   double timeout = 5.0;
   moveit_msgs::MoveItErrorCodes error_code;
-  solution.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+  solution.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
   std::vector<std::string> fk_names;
-  fk_names.push_back(ikfast_test.kinematics_solver_->getTipFrame());
+  fk_names.push_back(kinematics_test.kinematics_solver_->getTipFrame());
   robot_state::RobotState kinematic_state(kinematic_model);
 
   unsigned int success = 0;
   ros::WallTime start_time = ros::WallTime::now();
   for(unsigned int i=0; i < NUM_IK_TEST; ++i)
   {
-    seed.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
-    fk_values.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+    seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
+    fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     kinematic_state.setToRandomPositions(joint_model_group);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
 
-    bool result_fk = ikfast_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
+    bool result_fk = kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
     ASSERT_TRUE(result_fk);
     solution.clear();
-    EXPECT_TRUE(ikfast_test.kinematics_solver_->searchPositionIK(poses[0], seed, timeout, solution, error_code));
+    EXPECT_TRUE(kinematics_test.kinematics_solver_->searchPositionIK(poses[0], seed, timeout, solution, error_code));
     bool result = error_code.val == error_code.SUCCESS;
 
     ROS_DEBUG("Pose: %f %f %f",poses[0].position.x, poses[0].position.y, poses[0].position.z);
@@ -215,7 +215,7 @@ TEST(IKFastPlugin, searchIK)
 
     if(result)
     {
-      EXPECT_TRUE(ikfast_test.kinematics_solver_->getPositionIK(poses[0], solution, solution, error_code));
+      EXPECT_TRUE(kinematics_test.kinematics_solver_->getPositionIK(poses[0], solution, solution, error_code));
       result = error_code.val == error_code.SUCCESS;
     }
 
@@ -231,7 +231,7 @@ TEST(IKFastPlugin, searchIK)
 
     std::vector<geometry_msgs::Pose> new_poses;
     new_poses.resize(1);
-    result_fk = ikfast_test.kinematics_solver_->getPositionFK(fk_names, solution, new_poses);
+    result_fk = kinematics_test.kinematics_solver_->getPositionFK(fk_names, solution, new_poses);
     EXPECT_NEAR(poses[0].position.x, new_poses[0].position.x, IK_NEAR);
     EXPECT_NEAR(poses[0].position.y, new_poses[0].position.y, IK_NEAR);
     EXPECT_NEAR(poses[0].position.z, new_poses[0].position.z, IK_NEAR);
@@ -254,29 +254,29 @@ TEST(IKFastPlugin, searchIKWithCallback)
   const boost::shared_ptr<srdf::Model> &srdf_model = rdf_loader_.getSRDF();
   const boost::shared_ptr<urdf::ModelInterface>& urdf_model = rdf_loader_.getURDF();
   kinematic_model.reset(new robot_model::RobotModel(urdf_model, srdf_model));
-  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(ikfast_test.kinematics_solver_->getGroupName());
+  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(kinematics_test.kinematics_solver_->getGroupName());
 
   //Test inverse kinematics
   std::vector<double> seed, fk_values, solution;
   double timeout = 5.0;
   moveit_msgs::MoveItErrorCodes error_code;
-  solution.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+  solution.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
   std::vector<std::string> fk_names;
-  fk_names.push_back(ikfast_test.kinematics_solver_->getTipFrame());
+  fk_names.push_back(kinematics_test.kinematics_solver_->getTipFrame());
   robot_state::RobotState kinematic_state(kinematic_model);
 
   unsigned int success = 0;
   ros::WallTime start_time = ros::WallTime::now();
   for(unsigned int i=0; i < NUM_IK_TEST; ++i)
   {
-    seed.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
-    fk_values.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+    seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
+    fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     kinematic_state.setToRandomPositions(joint_model_group);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
 
-    bool result_fk = ikfast_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
+    bool result_fk = kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
     ASSERT_TRUE(result_fk);
 
     // check height
@@ -286,8 +286,8 @@ TEST(IKFastPlugin, searchIKWithCallback)
     }
 
     solution.clear();
-    EXPECT_TRUE(ikfast_test.kinematics_solver_->searchPositionIK(poses[0], fk_values, timeout, solution,
-                                                                 boost::bind(&IKFastTest::searchIKCallback,&ikfast_test,
+    EXPECT_TRUE(kinematics_test.kinematics_solver_->searchPositionIK(poses[0], fk_values, timeout, solution,
+                                                                 boost::bind(&KinematicsTest::searchIKCallback,&kinematics_test,
                                                                              _1,_2,_3),error_code));
     bool result = error_code.val == error_code.SUCCESS;
 
@@ -296,7 +296,7 @@ TEST(IKFastPlugin, searchIKWithCallback)
 
     if(result)
     {
-      EXPECT_TRUE(ikfast_test.kinematics_solver_->getPositionIK(poses[0], solution, solution, error_code));
+      EXPECT_TRUE(kinematics_test.kinematics_solver_->getPositionIK(poses[0], solution, solution, error_code));
       result = error_code.val == error_code.SUCCESS;
     }
 
@@ -312,7 +312,7 @@ TEST(IKFastPlugin, searchIKWithCallback)
 
     std::vector<geometry_msgs::Pose> new_poses;
     new_poses.resize(1);
-    result_fk = ikfast_test.kinematics_solver_->getPositionFK(fk_names, solution, new_poses);
+    result_fk = kinematics_test.kinematics_solver_->getPositionFK(fk_names, solution, new_poses);
     EXPECT_NEAR(poses[0].position.x, new_poses[0].position.x, IK_NEAR);
     EXPECT_NEAR(poses[0].position.y, new_poses[0].position.y, IK_NEAR);
     EXPECT_NEAR(poses[0].position.z, new_poses[0].position.z, IK_NEAR);
@@ -336,33 +336,33 @@ TEST(IKFastPlugin, getIK)
   const boost::shared_ptr<srdf::Model> &srdf_model = rdf_loader_.getSRDF();
   const boost::shared_ptr<urdf::ModelInterface>& urdf_model = rdf_loader_.getURDF();
   kinematic_model.reset(new robot_model::RobotModel(urdf_model, srdf_model));
-  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(ikfast_test.kinematics_solver_->getGroupName());
+  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(kinematics_test.kinematics_solver_->getGroupName());
 
   //Test inverse kinematics
   std::vector<double> seed, fk_values, solution;
   double timeout = 5.0;
   moveit_msgs::MoveItErrorCodes error_code;
-  solution.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+  solution.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
   std::vector<std::string> fk_names;
-  fk_names.push_back(ikfast_test.kinematics_solver_->getTipFrame());
+  fk_names.push_back(kinematics_test.kinematics_solver_->getTipFrame());
   robot_state::RobotState kinematic_state(kinematic_model);
 
   unsigned int success = 0;
   ros::WallTime start_time = ros::WallTime::now();
   for(unsigned int i=0; i < NUM_IK_TEST; ++i)
   {
-    seed.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
-    fk_values.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+    seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
+    fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     kinematic_state.setToRandomPositions(joint_model_group);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
 
-    bool result_fk = ikfast_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
+    bool result_fk = kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses);
     ASSERT_TRUE(result_fk);
     solution.clear();
 
-    EXPECT_TRUE(ikfast_test.kinematics_solver_->getPositionIK(poses[0], fk_values, solution, error_code));
+    EXPECT_TRUE(kinematics_test.kinematics_solver_->getPositionIK(poses[0], fk_values, solution, error_code));
     ROS_DEBUG("Pose: %f %f %f",poses[0].position.x, poses[0].position.y, poses[0].position.z);
     ROS_DEBUG("Orient: %f %f %f %f",poses[0].orientation.x, poses[0].orientation.y, poses[0].orientation.z, poses[0].orientation.w);
 
@@ -378,7 +378,7 @@ TEST(IKFastPlugin, getIK)
 
     std::vector<geometry_msgs::Pose> new_poses;
     new_poses.resize(1);
-    result_fk = ikfast_test.kinematics_solver_->getPositionFK(fk_names, solution, new_poses);
+    result_fk = kinematics_test.kinematics_solver_->getPositionFK(fk_names, solution, new_poses);
     EXPECT_NEAR(poses[0].position.x, new_poses[0].position.x, IK_NEAR);
     EXPECT_NEAR(poses[0].position.y, new_poses[0].position.y, IK_NEAR);
     EXPECT_NEAR(poses[0].position.z, new_poses[0].position.z, IK_NEAR);
@@ -401,7 +401,7 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
   const boost::shared_ptr<srdf::Model> &srdf_model = rdf_loader_.getSRDF();
   const boost::shared_ptr<urdf::ModelInterface>& urdf_model = rdf_loader_.getURDF();
   kinematic_model.reset(new robot_model::RobotModel(urdf_model, srdf_model));
-  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(ikfast_test.kinematics_solver_->getGroupName());
+  robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup(kinematics_test.kinematics_solver_->getGroupName());
 
   //Test inverse kinematics
   std::vector<double> seed, fk_values;
@@ -411,24 +411,24 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
   kinematics::KinematicsResult result;
 
   std::vector<std::string> fk_names;
-  fk_names.push_back(ikfast_test.kinematics_solver_->getTipFrame());
+  fk_names.push_back(kinematics_test.kinematics_solver_->getTipFrame());
   robot_state::RobotState kinematic_state(kinematic_model);
 
   unsigned int success = 0;
   ros::WallTime start_time = ros::WallTime::now();
   for(unsigned int i=0; i < NUM_IK_TEST; ++i)
   {
-    seed.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
-    fk_values.resize(ikfast_test.kinematics_solver_->getJointNames().size(), 0.0);
+    seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
+    fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     kinematic_state.setToRandomPositions(joint_model_group);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
 
-    ASSERT_TRUE(ikfast_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses));
+    ASSERT_TRUE(kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses));
 
     solutions.clear();
-    EXPECT_TRUE(ikfast_test.kinematics_solver_->getPositionIK(poses, solutions, result,options));
+    EXPECT_TRUE(kinematics_test.kinematics_solver_->getPositionIK(poses, solutions, result,options));
     ROS_DEBUG("Pose: %f %f %f",poses[0].position.x, poses[0].position.y, poses[0].position.z);
     ROS_DEBUG("Orient: %f %f %f %f",poses[0].orientation.x, poses[0].orientation.y, poses[0].orientation.z, poses[0].orientation.w);
 
@@ -449,7 +449,7 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
     for(unsigned int i = 0; i < solutions.size();i++)
     {
       std::vector<double>& solution = solutions[i];
-      EXPECT_TRUE(ikfast_test.kinematics_solver_->getPositionFK(fk_names, solution, new_poses));
+      EXPECT_TRUE(kinematics_test.kinematics_solver_->getPositionFK(fk_names, solution, new_poses));
       EXPECT_NEAR(poses[0].position.x, new_poses[0].position.x, IK_NEAR);
       EXPECT_NEAR(poses[0].position.y, new_poses[0].position.y, IK_NEAR);
       EXPECT_NEAR(poses[0].position.z, new_poses[0].position.z, IK_NEAR);

@@ -26,13 +26,12 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_rostest_gtest(${PROJECT_NAME}_ikfast launch/test_ikfast.launch src/test_ikfast_plugin.cpp)
-target_link_libraries(${PROJECT_NAME}_ikfast ${catkin_LIBRARIES} ${boost_LIBRARIES})
-
-
 #############
 ## Testing ##
 #############
+
+add_rostest_gtest(${PROJECT_NAME}_utest launch/test_kinematics_plugin.launch src/test_kinematics_plugin.cpp)
+target_link_libraries(${PROJECT_NAME}_utest ${catkin_LIBRARIES} ${boost_LIBRARIES})
 
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_kinematics_base_test.cpp)
