@@ -149,12 +149,9 @@ TEST(IKFastPlugin, initialize)
 
   for(unsigned int i = 0;i < joint_names.size();i++)
   {
-    if(joint_names[i]!=kinematics_test.joints_[i])
-    {
-      ROS_ERROR_STREAM("Joint names differ");
-      EXPECT_TRUE(false);
-      break;
-    }
+
+    std::vector<std::string>::iterator pos = std::find(kinematics_test.joints_.begin(),kinematics_test.joints_.end(),joint_names[i]);
+    EXPECT_TRUE(pos != kinematics_test.joints_.end()) << "Joint "<<joint_names[i]<<" not found in list";
   }
 }
 
@@ -398,7 +395,7 @@ TEST(IKFastPlugin, getIK)
     }
     else
     {
-      ROS_ERROR_STREAM("getPositionIK failed on test "<<i+1);
+      ROS_ERROR_STREAM("getPositionIK failed on test "<<i+1<<" for group " <<kinematics_test.kinematics_solver_->getGroupName());
       continue;
     }
 
@@ -465,7 +462,7 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
     }
     else
     {
-      ROS_ERROR_STREAM("getPositionIK failed on test "<<i+1);
+      ROS_ERROR_STREAM("getPositionIK with multiple solutions failed on test "<<i+1<<" for group " <<kinematics_test.kinematics_solver_->getGroupName());
       continue;
     }
 
