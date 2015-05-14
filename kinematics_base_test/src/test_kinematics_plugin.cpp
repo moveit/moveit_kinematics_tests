@@ -438,6 +438,7 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
   robot_state::RobotState kinematic_state(kinematic_model);
 
   unsigned int success = 0;
+  unsigned int num_ik_solutions = 0;
   ros::WallTime start_time = ros::WallTime::now();
   for(unsigned int i=0; i < kinematics_test.num_ik_multiple_tests_; ++i)
   {
@@ -457,8 +458,9 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
 
     if(result.kinematic_error == kinematics::KinematicErrors::OK)
     {
-      EXPECT_GT(solutions.size(),0);
+      EXPECT_GT(solutions.size(),0)<<"Found "<<solutions.size()<<" ik solutions.";
       success = solutions.empty() ? success : success + 1;
+      num_ik_solutions+=solutions.size();
     }
     else
     {
@@ -487,7 +489,8 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
 
 
   ROS_INFO_STREAM("Success Rate: "<<(double)success/kinematics_test.num_ik_multiple_tests_);
-  EXPECT_GT(success , 0.99 * kinematics_test.num_ik_multiple_tests_);
+  EXPECT_GT(success , 0.99 * kinematics_test.num_ik_multiple_tests_)<<"A total of "<<num_ik_solutions <<" ik solutions were found out of "
+      <<kinematics_test.num_ik_multiple_tests_<<" tests.";
   ROS_INFO_STREAM("Elapsed time: "<< (ros::WallTime::now()-start_time).toSec());
 }
 
