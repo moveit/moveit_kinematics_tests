@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(kinematics_base_test)
 
 find_package(catkin REQUIRED COMPONENTS
-  descartes_core
   moveit_core
   pluginlib
   rostest
