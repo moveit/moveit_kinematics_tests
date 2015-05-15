@@ -23,7 +23,7 @@ This repo contains unit test for validating upgrades to the moveit KinematicsBas
 - Cd into the catkin workspace directory and run the following
 
   ```
-  catkin_make kinematics_base_test_ikfast
+  catkin_make kinematics_base_test_utest
   ```
   
 ### Run ROS unit test
