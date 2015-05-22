@@ -1,11 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 
-  <include file="$(find kuka_kr210_moveit_config)/launch/planning_context.launch">
-    <arg name="load_robot_description" value="true"/>
-  </include>
-
  <include file="$(find kinematics_base_test)/launch/test_ikfast_plugin.launch" />
+ <include file="$(find kinematics_base_test)/launch/test_ikfast_w_redundancy_plugin.launch" />
  <include file="$(find kinematics_base_test)/launch/test_kdl_plugin.launch" />
  <include file="$(find kinematics_base_test)/launch/test_pr2_kinematics_plugin.launch" />
 </launch>

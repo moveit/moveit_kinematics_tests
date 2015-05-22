@@ -452,7 +452,7 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
     ASSERT_TRUE(kinematics_test.kinematics_solver_->getPositionFK(fk_names, fk_values, poses));
 
     solutions.clear();
-    kinematics_test.kinematics_solver_->getPositionIK(poses, solutions, result,options);
+    kinematics_test.kinematics_solver_->getPositionIK(poses,fk_values, solutions, result,options);
     ROS_DEBUG("Pose: %f %f %f",poses[0].position.x, poses[0].position.y, poses[0].position.z);
     ROS_DEBUG("Orient: %f %f %f %f",poses[0].orientation.x, poses[0].orientation.y, poses[0].orientation.z, poses[0].orientation.w);
 
