@@ -164,6 +164,7 @@ public:
    * 'getPositionIK(...)' with a zero initialized seed.
    *
    * @param ik_poses  The desired pose of each tip link
+   * @param ik_seed_state an initial guess solution for the inverse kinematics
    * @param solutions A vector of vectors where each entry is a valid joint solution
    * @param result A struct that reports the results of the query
    * @param options An option struct which contains the type of redundancy discretization used. This default
@@ -328,7 +329,7 @@ bool IKFastKinematicsPlugin::initialize(const std::string &robot_description,
   {
     redundant_joint_indices_.clear();
     redundant_joint_indices_.push_back(free_params_[0]);
-    KinematicsBase::setSearchDiscretization(0);
+    KinematicsBase::setSearchDiscretization(DEFAULT_SEARCH_DISCRETIZATION);
   }
 
   urdf::Model robot_model;
@@ -444,6 +445,13 @@ void IKFastKinematicsPlugin::setSearchDiscretization(const std::map<int,double>&
                      redundant_joint<<"' with index " <<redundant_joint_indices_[0]<<" is redundant.");
     return;
   }
+
+  if(discretization.begin()->second <= 0.0)
+  {
+	  ROS_ERROR_STREAM("Discretization can not takes values that are <= 0");
+	  return;
+  }
+
 
   redundant_joint_discretization_.clear();
   redundant_joint_discretization_[redundant_joint_indices_[0]] = discretization.begin()->second;
@@ -1221,9 +1229,10 @@ bool IKFastKinematicsPlugin::sampleRedundantJoint(kinematics::DiscretizationMeth
       break;
     case kinematics::DiscretizationMethods::ALL_RANDOM_SAMPLED:
     {
-      int count = joint_dscrt > 1 ? static_cast<int>(joint_dscrt) : 1;
+      int steps = std::ceil((joint_max - joint_min)/joint_dscrt);
+      steps = steps > 0 ? steps : 1;
       double diff = joint_max - joint_min;
-      for(int i = 0; i < count; i++)
+      for(int i = 0; i < steps; i++)
       {
         sampled_joint_vals.push_back( ((diff*std::rand())/(static_cast<double>(RAND_MAX))) + joint_min );
       }
