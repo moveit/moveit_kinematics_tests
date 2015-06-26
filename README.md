@@ -11,7 +11,7 @@ This repo contains unit test for validating upgrades to the moveit KinematicsBas
 - Cd into the 'src' directory of your catkin workspace and run the following:
   ```
   wstool init . 
-  wstool merge https://raw.githubusercontent.com/jrgnicho/kinematics_base_tests/indigo-devel/install.rosinstall
+  wstool merge https://raw.githubusercontent.com/ros-planning/moveit_kinematics_tests/jade-devel/install.rosinstall
   wstool update
   rosdep install --from-paths . --ignore-src
   cd ..
