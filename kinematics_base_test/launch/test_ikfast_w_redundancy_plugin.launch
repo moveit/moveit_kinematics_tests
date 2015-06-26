@@ -2,7 +2,7 @@
 <launch>
   <group ns="ikfast_w_redundancy">
 
-    <include file="$(find motoman_sia20d_moveit_config)/launch/planning_context.launch">
+    <include file="$(find test_motoman_sia20d_moveit_config)/launch/planning_context.launch">
       <arg name="load_robot_description" value="true"/>
     </include>
 
