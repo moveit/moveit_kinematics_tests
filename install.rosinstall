@@ -1,14 +1,10 @@
-- git: {local-name: kinematics_base_tests, uri: 'https://github.com/jrgnicho/kinematics_base_tests.git',
-version: indigo-devel}
-- git: {local-name: kuka_experimental, uri: 'https://github.com/ros-industrial/kuka_experimental',
-version: hydro-devel}
-- git: {local-name: motoman, uri: 'https://github.com/ros-industrial/motoman.git',
-version: indigo-devel}
-- git: {local-name: moveit_core, uri: 'https://github.com/jrgnicho/moveit_core.git',
-version: ikplugin_changes}
-- git: {local-name: moveit_ros, uri: 'https://github.com/jrgnicho/moveit_ros.git',
-version: kinematic_base_changes}
-- git: {local-name: moveit_ikfast, uri: 'https://github.com/jrgnicho/moveit_ikfast.git',
-version: kinematic_base_changes}
+- git: {local-name: kinematics_base_tests, uri: 'https://github.com/ros-planning/moveit_kinematics_tests.git',
+version: jade-devel}
+- git: {local-name: moveit_core, uri: 'https://github.com/ros-planning/moveit_core.git',
+version: jade-devel}
+- git: {local-name: moveit_ros, uri: 'https://github.com/ros-planning/moveit_ros.git',
+version: jade-devel}
+- git: {local-name: moveit_ikfast, uri: 'https://github.com/ros-planning/moveit_ikfast.git',
+version: jade-devel}
 - git: {local-name: moveit_pr2, uri: 'https://github.com/ros-planning/moveit_pr2.git',
 version: indigo-devel}
