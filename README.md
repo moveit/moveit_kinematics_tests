@@ -1,5 +1,5 @@
 # kinematics base tests
-This repo contains unit test for validating upgrades to the moveit KinematicsBase interface class proposed [here](https://github.com/ros-planning/moveit_core/pull/231).  The ikfast unit test loads up a ikfast kinematics solver for the KukakR210 robot as a plugin.  It mimics the unit test for the [pr2 arm](https://github.com/ros-planning/moveit_pr2/blob/indigo-devel/pr2_moveit_tests/kinematics/src/test_kinematics_as_plugin.cpp) by making several calls to the searchPositionIK, searchPositionIK (with callback), getPositionIK and getPositionIK (with multiple solutions).  
+This repo contains unit tests for validating various implementation of the moveit_core::KinematicsBase interface class that are exposed as plugins.  These implementations include ikfast, kdl and the pr2 arms. The tests consist of invoking commonly used methods such as initialize, searchPositionIK, searchPositionIK (with callback), getPositionIK and getPositionIK (with multiple solutions).  The ikfast unit tests load up the ikfast kinematics solvers for the KukakR210 and Motoman SIA20d robots.  The MotomanSIA20d arm is used here in order to verify that ikfast handles the redundant joint case appropriately.
 
 ### Installation
 
