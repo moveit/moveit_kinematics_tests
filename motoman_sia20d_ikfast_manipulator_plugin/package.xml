@@ -35,6 +35,7 @@
   <export>
     <!-- Other tools can request additional information be placed here -->
     <moveit_core plugin="${prefix}/motoman_sia20d_manipulator_moveit_ikfast_plugin_description.xml"/>
+    <moveit_core plugin="${prefix}/test_motoman_sia20d_manipulator_moveit_ikfast_plugin_description.xml"/>
   </export>
   <build_depend>moveit_core</build_depend>
   <build_depend>liblapack-dev</build_depend>

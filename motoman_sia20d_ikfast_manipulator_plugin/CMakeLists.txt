@@ -21,18 +21,18 @@ catkin_package(
 
 include_directories(include)
 
-set(IKFAST_LIBRARY_NAME motoman_sia20d_manipulator_moveit_ikfast_plugin)
+set(IKFAST_LIBRARY_NAME test_motoman_sia20d_manipulator_moveit_ikfast_plugin)
 
 find_package(LAPACK REQUIRED)
 
-add_library(${IKFAST_LIBRARY_NAME} src/motoman_sia20d_manipulator_ikfast_moveit_plugin.cpp)
+add_library(${IKFAST_LIBRARY_NAME} src/test_motoman_sia20d_manipulator_ikfast_moveit_plugin.cpp)
 target_link_libraries(${IKFAST_LIBRARY_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${LAPACK_LIBRARIES})
 
 install(TARGETS ${IKFAST_LIBRARY_NAME} LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
 install(
   FILES
-  motoman_sia20d_manipulator_moveit_ikfast_plugin_description.xml
+  test_motoman_sia20d_manipulator_moveit_ikfast_plugin_description.xml
   DESTINATION
   ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
