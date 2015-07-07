@@ -21,18 +21,18 @@ catkin_package(
 
 include_directories(include)
 
-set(IKFAST_LIBRARY_NAME kuka_kr210_manipulator_moveit_ikfast_plugin)
+set(IKFAST_LIBRARY_NAME test_kuka_kr210_manipulator_moveit_ikfast_plugin)
 
 find_package(LAPACK REQUIRED)
 
-add_library(${IKFAST_LIBRARY_NAME} src/kuka_kr210_manipulator_ikfast_moveit_plugin.cpp)
+add_library(${IKFAST_LIBRARY_NAME} src/test_kuka_kr210_manipulator_ikfast_moveit_plugin.cpp)
 target_link_libraries(${IKFAST_LIBRARY_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${LAPACK_LIBRARIES})
 
 install(TARGETS ${IKFAST_LIBRARY_NAME} LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
 install(
   FILES
-  kuka_kr210_manipulator_moveit_ikfast_plugin_description.xml
+  test_kuka_kr210_manipulator_moveit_ikfast_plugin_description.xml
   DESTINATION
   ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

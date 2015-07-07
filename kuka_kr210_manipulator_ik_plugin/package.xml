@@ -37,6 +37,7 @@
     <!-- <metapackage/> -->
     <!-- Other tools can request additional information be placed here -->
     <moveit_core plugin="${prefix}/kuka_kr210_manipulator_moveit_ikfast_plugin_description.xml"/>
+    <moveit_core plugin="${prefix}/test_kuka_kr210_manipulator_moveit_ikfast_plugin_description.xml"/>
   </export>
   <build_depend>moveit_core</build_depend>
   <build_depend>liblapack-dev</build_depend>

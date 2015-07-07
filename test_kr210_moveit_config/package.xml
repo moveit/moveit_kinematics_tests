@@ -1,6 +1,6 @@
 <package>
 
-  <name>test_kr210_moveit_config</name>
+  <name>test_kuka_kr210_moveit_config</name>
   <version>0.2.0</version>
   <description>
      An automatically generated package with all the configuration and launch files for using the test_kuka_kr210 with the MoveIt Motion Planning Framework
