@@ -55,7 +55,7 @@ public:
     }
     else
     {
-      ROS_ERROR_STREAM("The plugin "<<plugin_name<" was not found");
+      ROS_ERROR_STREAM("The plugin "<<plugin_name<<" was not found");
       EXPECT_TRUE(false);
       return false;
     }
