@@ -43,7 +43,7 @@ public:
       try
       {
         ROS_INFO_STREAM("Loading "<<plugin_name);
-        kinematics_solver_ = kinematics_loader_->createInstance(plugin_name);
+        kinematics_solver_ = make_shared_ptr( lvalue(kinematics_loader_->createInstance(plugin_name)));
       }
       catch(pluginlib::PluginlibException& e)
       {
@@ -122,6 +122,16 @@ public:
 
 
 public:
+
+
+template <typename T>
+constexpr T &lvalue(T &&r) noexcept { return r; }
+
+template<typename T>
+std::shared_ptr<T> make_shared_ptr( boost::shared_ptr< T >& ptr)
+{
+    return std::shared_ptr<T >(ptr.get(), [ptr](T *) mutable {ptr.reset();});
+}
 
   kinematics::KinematicsBasePtr kinematics_solver_;
   boost::shared_ptr<KinematicsLoader> kinematics_loader_;
