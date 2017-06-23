@@ -583,6 +583,10 @@ TEST(IKFastPlugin, getnearestIKSolution) {
 
     ASSERT_TRUE(kinematics_test.kinematics_solver_->getPositionFK(
         fk_names, fk_values, poses));
+
+    // uncomment next line to see the behavior change of KDL plugin
+    //    seed = fk_values;
+
     // getIK
     solution_getIK.clear();
     kinematics_test.kinematics_solver_->getPositionIK(
@@ -606,8 +610,6 @@ TEST(IKFastPlugin, getnearestIKSolution) {
         double smallest_error_multipleIK = DBL_MAX;
         for (unsigned int i = 0; i < solutions.size(); i++) {
           std::vector<double> &solution_multipleIK = solutions[i];
-          //             EXPECT_TRUE(kinematics_test.kinematics_solver_->getPositionFK(fk_names,
-          //             solution_multipleIK, new_poses));
           double error_multipleIK = 0.0;
           for (std::size_t j = 0; j < seed.size(); ++j) {
             error_multipleIK =
@@ -620,8 +622,10 @@ TEST(IKFastPlugin, getnearestIKSolution) {
         }
         ASSERT_DOUBLE_EQ(smallest_error_multipleIK, error_getIK);
       } else {
+        ROS_INFO_STREAM("Something is wrong. It shouldn't be happening");
       }
     } else {
+      ROS_INFO_STREAM("No Solution Found");
     }
   }
 
