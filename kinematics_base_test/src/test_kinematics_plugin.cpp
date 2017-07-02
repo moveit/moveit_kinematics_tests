@@ -43,7 +43,7 @@ public:
       try
       {
         ROS_INFO_STREAM("Loading "<<plugin_name);
-        kinematics_solver_ = kinematics_loader_->createInstance(plugin_name);
+        kinematics_solver_.reset(kinematics_loader_->createUnmanagedInstance(plugin_name));
       }
       catch(pluginlib::PluginlibException& e)
       {
