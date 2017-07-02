@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rostest
   rosunit
   moveit_ros_planning
+  moveit_kinematics
 )
 
 find_package(Boost REQUIRED COMPONENTS system)
@@ -34,11 +35,3 @@ include_directories(
 add_rostest_gtest(${PROJECT_NAME}_utest launch/test_kinematics_plugin.launch src/test_kinematics_plugin.cpp)
 target_link_libraries(${PROJECT_NAME}_utest ${catkin_LIBRARIES} ${boost_LIBRARIES})
 
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_kinematics_base_test.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
