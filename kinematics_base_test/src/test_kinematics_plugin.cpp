@@ -25,6 +25,7 @@ const std::string NUM_FK_TESTS = "num_fk_tests";
 const std::string NUM_IK_CB_TESTS = "num_ik_cb_tests";
 const std::string NUM_IK_TESTS = "num_ik_tests";
 const std::string NUM_IK_MULTIPLE_TESTS = "num_ik_multiple_tests";
+const std::string NUM_NEAREST_IK_TESTS = "num_nearest_ik_tests";
 const double DEFAULT_SEARCH_DISCRETIZATION = 0.01f;
 
 class KinematicsTest {
@@ -39,8 +40,6 @@ public:
     if (ph.getParam(PLUGIN_NAME_PARAM, plugin_name)) {
       try {
         ROS_INFO_STREAM("Loading " << plugin_name);
-        //        kinematics_solver_ =
-        //        kinematics_loader_->createInstance(plugin_name);
         kinematics_solver_ = make_shared_ptr(
             lvalue(kinematics_loader_->createInstance(plugin_name)));
       } catch (pluginlib::PluginlibException &e) {
@@ -118,6 +117,7 @@ public:
   std::shared_ptr<T> make_shared_ptr(boost::shared_ptr<T> &ptr) {
     return std::shared_ptr<T>(ptr.get(), [ptr](T *) mutable { ptr.reset(); });
   }
+
   kinematics::KinematicsBasePtr kinematics_solver_;
   boost::shared_ptr<KinematicsLoader> kinematics_loader_;
   std::string root_link_;
@@ -542,43 +542,57 @@ TEST(IKFastPlugin, getnearestIKSolution) {
       kinematic_model->getJointModelGroup(
           kinematics_test.kinematics_solver_->getGroupName());
 
-  // Test inverse kinematics
-  std::vector<double> seed, fk_values;
+  // getmultipleIK intialization
   std::vector<std::vector<double>> solutions;
   double timeout = 5.0;
   kinematics::KinematicsQueryOptions options;
   kinematics::KinematicsResult result;
 
-  // getIK
+  // getIK intialization
   moveit_msgs::MoveItErrorCodes error_code;
   std::vector<double> solution_getIK;
-  solution_getIK.resize(
-      kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
+
+  // forward_kinematics and seed
+  std::vector<double> seed, fk_values;
+  fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(),
+                   0.0);
+  seed.resize(fk_values.size(), 0.0);
 
   std::vector<std::string> fk_names;
   fk_names.push_back(kinematics_test.kinematics_solver_->getTipFrame());
   robot_state::RobotState kinematic_state(kinematic_model);
 
-  double min = -3.14;
-  double max = 3.14;
-  double rnd;
+  // Bounds from robot model for seed
+  robot_model::JointBoundsVector joint_bounds =
+      joint_model_group->getActiveJointModelsBounds();
 
-  unsigned int success = 0;
-  unsigned int num_ik_solutions = 0;
+  std::vector<double> min, max;
+  min.resize(seed.size(), -M_PI);
+  max.resize(seed.size(), M_PI);
+  for (std::size_t i = 0; i < seed.size(); i++) {
+    const robot_model::JointModel::Bounds &bounds = *joint_bounds[i];
+    for (std::size_t j = 0; j < bounds.size(); j++) {
+      // read from the model if joint is bounded
+      if (bounds[j].position_bounded_) {
+        min[i] = bounds[j].min_position_;
+        max[i] = bounds[j].max_position_;
+      }
+    }
+  }
+
+  srand((unsigned)time(0)); // seed random number generator
   ros::WallTime start_time = ros::WallTime::now();
+
   for (unsigned int i = 0; i < kinematics_test.num_nearest_ik_tests_; ++i) {
-    seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(),
-                0.0);
-    fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(),
-                     0.0);
     kinematic_state.setToRandomPositions(joint_model_group);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
 
+    // populating seed vector
     for (std::size_t i = 0; i < seed.size(); i++) {
       double rnd = (double)rand() / (double)RAND_MAX;
-      seed[i] = min + rnd * (max - min);
+      seed[i] = min[i] + rnd * (max[i] - min[i]);
     }
 
     ASSERT_TRUE(kinematics_test.kinematics_solver_->getPositionFK(
@@ -587,16 +601,24 @@ TEST(IKFastPlugin, getnearestIKSolution) {
     // uncomment next line to see the behavior change of KDL plugin
     //    seed = fk_values;
 
-    // getIK
+    // getPositionIK for single solution
     solution_getIK.clear();
     kinematics_test.kinematics_solver_->getPositionIK(
         poses[0], seed, solution_getIK, error_code);
+    ROS_DEBUG("Pose: %f %f %f", poses[0].position.x, poses[0].position.y,
+              poses[0].position.z);
+    ROS_DEBUG("Orient: %f %f %f %f", poses[0].orientation.x,
+              poses[0].orientation.y, poses[0].orientation.z,
+              poses[0].orientation.w);
+
+    // check if getPositionIK call for single solution returns solution
     if (error_code.val == error_code.SUCCESS) {
       double error_getIK = 0.0;
       for (std::size_t j = 0; j < seed.size(); ++j) {
-        error_getIK = error_getIK + fabs(solution_getIK[j] - seed[j]);
+        error_getIK += fabs(solution_getIK[j] - seed[j]);
       }
 
+      // getPositionIK for multiple solutions
       solutions.clear();
       kinematics_test.kinematics_solver_->getPositionIK(poses, seed, solutions,
                                                         result, options);
@@ -606,26 +628,27 @@ TEST(IKFastPlugin, getnearestIKSolution) {
                 poses[0].orientation.y, poses[0].orientation.z,
                 poses[0].orientation.w);
 
+      // check if getPositionIK call for multiple solutions returns solution
       if (result.kinematic_error == kinematics::KinematicErrors::OK) {
-        double smallest_error_multipleIK = DBL_MAX;
+        double smallest_error_multipleIK = (std::numeric_limits<double>::max());
         for (unsigned int i = 0; i < solutions.size(); i++) {
           std::vector<double> &solution_multipleIK = solutions[i];
           double error_multipleIK = 0.0;
           for (std::size_t j = 0; j < seed.size(); ++j) {
-            error_multipleIK =
-                error_multipleIK + fabs(solution_multipleIK[j] - seed[j]);
+            error_multipleIK += fabs(solution_multipleIK[j] - seed[j]);
           }
 
           if (error_multipleIK <= smallest_error_multipleIK) {
             smallest_error_multipleIK = error_multipleIK;
           }
         }
-        ASSERT_DOUBLE_EQ(smallest_error_multipleIK, error_getIK);
+        ASSERT_NEAR(smallest_error_multipleIK, error_getIK, IK_NEAR);
       } else {
-        ROS_INFO_STREAM("Something is wrong. It shouldn't be happening");
+        ROS_ERROR_STREAM(
+            "Multiple solution call fails even when single solution do exit");
       }
     } else {
-      ROS_INFO_STREAM("No Solution Found");
+      ROS_ERROR_STREAM("No Solution Found");
     }
   }
 
