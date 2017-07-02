@@ -6,6 +6,7 @@ This repo contains unit tests for validating various implementation of the movei
 - Install [wstool](http://wiki.ros.org/wstool) in order manage the repos inside the workspace
   ```
   sudo apt-get install python-wstool
+  sud
   ```
 
 - Cd into the 'src' directory of your catkin workspace and run the following:
@@ -15,20 +16,19 @@ This repo contains unit tests for validating various implementation of the movei
   wstool update
   rosdep install --from-paths . --ignore-src
   cd ..
-  catkin_make
-  ```
-  
-### Build ROS unit test
-
-- Cd into the catkin workspace directory and run the following
-
-  ```
-  catkin_make kinematics_base_test_utest
+  catkin build
   ```
   
 ### Run ROS unit test
 - Cd into the catkin workspace directory and run the following
 
   ```
-  catkin_make run_tests_kinematics_base_test
+  catkin run_tests kinematics_base_test
+  ```
+
+### See tests summary
+- Run the following:
+
+  ```
+  catkin_test_results
   ```

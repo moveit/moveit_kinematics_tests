@@ -35,3 +35,7 @@ include_directories(
 add_rostest_gtest(${PROJECT_NAME}_utest launch/test_kinematics_plugin.launch src/test_kinematics_plugin.cpp)
 target_link_libraries(${PROJECT_NAME}_utest ${catkin_LIBRARIES} ${boost_LIBRARIES})
 
+#############
+## Install ##
+#############
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
