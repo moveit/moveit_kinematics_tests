@@ -14,7 +14,6 @@
       <param name="num_ik_tests" value="100" />
       <param name="num_ik_cb_tests" value="100" />
       <param name="num_ik_multiple_tests" value="100" />
-      <param name="num_nearest_ik_tests" value="1000" />
       <param name="ik_plugin_name" value="pr2_arm_kinematics/PR2ArmKinematicsPlugin" />
       <rosparam param="joint_names">[
                                 r_elbow_flex_joint, 
@@ -34,7 +33,6 @@
       <param name="num_ik_tests" value="100" />
       <param name="num_ik_cb_tests" value="100" />
       <param name="num_ik_multiple_tests" value="100" />
-      <param name="num_nearest_ik_tests" value="1000" />
       <param name="ik_plugin_name" value="pr2_arm_kinematics/PR2ArmKinematicsPlugin" />
       <rosparam param="joint_names">[
                                 l_elbow_flex_joint, 

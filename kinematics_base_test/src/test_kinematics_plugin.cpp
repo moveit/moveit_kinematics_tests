@@ -27,6 +27,7 @@ const std::string NUM_IK_TESTS = "num_ik_tests";
 const std::string NUM_IK_MULTIPLE_TESTS = "num_ik_multiple_tests";
 const std::string NUM_NEAREST_IK_TESTS = "num_nearest_ik_tests";
 const double DEFAULT_SEARCH_DISCRETIZATION = 0.01f;
+const double EXPECTED_SUCCESS_RATE = 0.8;
 
 class KinematicsTest {
 public:
@@ -118,6 +119,7 @@ public:
     return std::shared_ptr<T>(ptr.get(), [ptr](T *) mutable { ptr.reset(); });
   }
 
+
   kinematics::KinematicsBasePtr kinematics_solver_;
   boost::shared_ptr<KinematicsLoader> kinematics_loader_;
   std::string root_link_;
@@ -197,7 +199,7 @@ TEST(IKFastPlugin, getFK) {
 
   ROS_INFO_STREAM("Success Rate: " << (double)success /
                                           kinematics_test.num_fk_tests_);
-  EXPECT_GT(success, 0.99 * kinematics_test.num_fk_tests_);
+  EXPECT_GT(success, EXPECTED_SUCCESS_RATE * kinematics_test.num_fk_tests_);
   ROS_INFO_STREAM(
       "Elapsed time: " << (ros::WallTime::now() - start_time).toSec());
 }
@@ -277,7 +279,7 @@ TEST(IKFastPlugin, searchIK) {
 
   ROS_INFO_STREAM("Success Rate: " << (double)success /
                                           kinematics_test.num_ik_tests_);
-  EXPECT_GT(success, 0.99 * kinematics_test.num_ik_tests_);
+  EXPECT_GT(success, EXPECTED_SUCCESS_RATE * kinematics_test.num_ik_tests_);
   ROS_INFO_STREAM(
       "Elapsed time: " << (ros::WallTime::now() - start_time).toSec());
 }
@@ -366,7 +368,7 @@ TEST(IKFastPlugin, searchIKWithCallback) {
 
   ROS_INFO_STREAM("Success Rate: " << (double)success /
                                           kinematics_test.num_ik_cb_tests_);
-  EXPECT_GT(success, 0.99 * kinematics_test.num_ik_cb_tests_);
+  EXPECT_GT(success, EXPECTED_SUCCESS_RATE * kinematics_test.num_ik_cb_tests_);
   ROS_INFO_STREAM(
       "Elapsed time: " << (ros::WallTime::now() - start_time).toSec());
 }
@@ -441,7 +443,7 @@ TEST(IKFastPlugin, getIK) {
 
   ROS_INFO_STREAM("Success Rate: " << (double)success /
                                           kinematics_test.num_ik_tests_);
-  EXPECT_GT(success, 0.99 * kinematics_test.num_ik_tests_);
+  EXPECT_GT(success, EXPECTED_SUCCESS_RATE * kinematics_test.num_ik_tests_);
   ROS_INFO_STREAM(
       "Elapsed time: " << (ros::WallTime::now() - start_time).toSec());
 }
@@ -524,7 +526,8 @@ TEST(IKFastPlugin, getIKMultipleSolutions) {
 
   ROS_INFO_STREAM("Success Rate: "
                   << (double)success / kinematics_test.num_ik_multiple_tests_);
-  EXPECT_GT(success, 0.99 * kinematics_test.num_ik_multiple_tests_)
+  EXPECT_GT(success,
+            EXPECTED_SUCCESS_RATE * kinematics_test.num_ik_multiple_tests_)
       << "A total of " << num_ik_solutions << " ik solutions were found out of "
       << kinematics_test.num_ik_multiple_tests_ << " tests.";
   ROS_INFO_STREAM(
