@@ -119,7 +119,6 @@ public:
     return std::shared_ptr<T>(ptr.get(), [ptr](T *) mutable { ptr.reset(); });
   }
 
-
   kinematics::KinematicsBasePtr kinematics_solver_;
   boost::shared_ptr<KinematicsLoader> kinematics_loader_;
   std::string root_link_;

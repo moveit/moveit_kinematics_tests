@@ -1,5 +1,5 @@
 # kinematics base tests
-This repo contains unit tests for validating various implementation of the moveit_core::KinematicsBase interface class that are exposed as plugins.  These implementations include ikfast, kdl and the pr2 arms. The tests consist of invoking commonly used methods such as initialize, searchPositionIK, searchPositionIK (with callback), getPositionIK and getPositionIK (with multiple solutions).  The ikfast unit tests load up the ikfast kinematics solvers for the KukakR210 and Motoman SIA20d robots.  The MotomanSIA20d arm is used here in order to verify that ikfast handles the redundant joint case appropriately.
+This repo runs unit tests on several implementations of the moveit_core::KinematicsBase interface that are available as plugins.  These implementations include the ikfast and kdl solvers. The tests consist of calling commonly used interface methods such as initialize, searchPositionIK, searchPositionIK (with callback), getPositionIK and getPositionIK (with multiple solutions).  The ik_fast solvers tested here are those for the KukakR210 and Motoman SIA20d robots.  The MotomanSIA20d arm is a 7 DOF and so it allows testing the redundant joint case.
 
 ### Installation
 
@@ -15,20 +15,19 @@ This repo contains unit tests for validating various implementation of the movei
   wstool update
   rosdep install --from-paths . --ignore-src
   cd ..
-  catkin_make
-  ```
-  
-### Build ROS unit test
-
-- Cd into the catkin workspace directory and run the following
-
-  ```
-  catkin_make kinematics_base_test_utest
+  catkin build
   ```
   
 ### Run ROS unit test
 - Cd into the catkin workspace directory and run the following
 
   ```
-  catkin_make run_tests_kinematics_base_test
+  catkin run_tests kinematics_base_test
+  ```
+
+### See tests summary
+- Run the following:
+
+  ```
+  catkin_test_results
   ```

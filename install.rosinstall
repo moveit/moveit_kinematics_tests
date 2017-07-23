@@ -1,12 +1,2 @@
-- git: {local-name: kinematics_base_tests, uri: 'https://github.com/ros-planning/moveit_kinematics_tests.git',
-version: jade-devel}
-- git: {local-name: moveit_core, uri: 'https://github.com/ros-planning/moveit_core.git',
-version: jade-devel}
-- git: {local-name: moveit_ros, uri: 'https://github.com/ros-planning/moveit_ros.git',
-version: jade-devel}
-- git: {local-name: moveit_ikfast, uri: 'https://github.com/ros-planning/moveit_ikfast.git',
-version: jade-devel}
-- git: {local-name: moveit_pr2, uri: 'https://github.com/ros-planning/moveit_pr2.git',
-version: indigo-devel}
-- git: {local-name: geometric_shapes, uri: 'https://github.com/ros-planning/geometric_shapes.git',
-version: indigo-devel}
+- git: {local-name: moveit_kinematics_tests, uri: 'https://github.com/ros-planning/moveit_kinematics_tests.git',
+version: kinetic-devel}
