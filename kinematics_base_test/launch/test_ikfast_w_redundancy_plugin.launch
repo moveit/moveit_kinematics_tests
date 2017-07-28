@@ -14,6 +14,7 @@
       <param name="num_ik_tests" value="100" />
       <param name="num_ik_cb_tests" value="100" />
       <param name="num_ik_multiple_tests" value="100" />
+      <param name="num_nearest_ik_tests" value="1000" />
       <param name="ik_plugin_name" value="test_motoman_sia20d_manipulator_kinematics/IKFastKinematicsPlugin" />
       <rosparam param="joint_names">[joint_s, joint_l, joint_e, joint_u, joint_r, joint_b, joint_t ]</rosparam>
     </test>

@@ -14,6 +14,7 @@
       <param name="num_ik_tests" value="100" />
       <param name="num_ik_cb_tests" value="100" />
       <param name="num_ik_multiple_tests" value="100" />
+      <param name="num_nearest_ik_tests" value="1000" />
       <param name="ik_plugin_name" value="test_kuka_kr210_manipulator_kinematics/IKFastKinematicsPlugin" />
       <rosparam param="joint_names">[joint_1, joint_2, joint_3, joint_4, joint_5, joint_6 ]</rosparam>
     </test>
