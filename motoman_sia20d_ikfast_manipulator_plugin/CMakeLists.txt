@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 2.8.12)
 project(motoman_sia20d_ikfast_manipulator_plugin)
 
 add_compile_options(-std=c++11)
