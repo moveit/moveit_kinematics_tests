@@ -9,10 +9,12 @@
   <url type="website">http://moveit.ros.org</url>
   <url type="bugtracker">https://github.com/ros-planning/moveit_kinematics_tests/issues</url>
   <url type="repository">https://github.com/ros-planning/moveit_kinematics_tests</url>
+
   <buildtool_depend>catkin</buildtool_depend>
   <export>
     <moveit_core plugin="${prefix}/test_motoman_sia20d_manipulator_moveit_ikfast_plugin_description.xml"/>
   </export>
+
   <build_depend>moveit_core</build_depend>
   <build_depend>liblapack-dev</build_depend>
   <build_depend>roscpp</build_depend>
