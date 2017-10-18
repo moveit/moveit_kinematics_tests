@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='ASCII'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <package>
   <name>kuka_kr210_manipulator_ik_plugin</name>
   <version>0.0.0</version>

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='ASCII'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <package>
   <name>motoman_sia20d_ikfast_manipulator_plugin</name>
   <version>0.0.0</version>
