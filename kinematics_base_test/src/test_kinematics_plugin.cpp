@@ -154,7 +154,7 @@ public:
       error_code.val = error_code.SUCCESS;
     else
       error_code.val = error_code.PLANNING_FAILED;
-  };
+  }
 
 public:
   kinematics::KinematicsBasePtr kinematics_solver_;
@@ -329,6 +329,7 @@ TEST(IKFastPlugin, searchIKWithCallback)
   robot_state::RobotState kinematic_state(kinematic_model);
 
   unsigned int success = 0;
+  uint removed_sample = 0;
   ros::WallTime start_time = ros::WallTime::now();
   for (unsigned int i = 0; i < kinematics_test.num_ik_cb_tests_; ++i)
   {
@@ -345,6 +346,7 @@ TEST(IKFastPlugin, searchIKWithCallback)
     // check height
     if (poses[0].position.z <= 0.0f)
     {
+      removed_sample ++;
       continue;
     }
 
@@ -386,8 +388,8 @@ TEST(IKFastPlugin, searchIKWithCallback)
     EXPECT_NEAR(poses[0].orientation.w, new_poses[0].orientation.w, IK_NEAR);
   }
 
-  ROS_INFO_STREAM("Success Rate: " << (double)success / kinematics_test.num_ik_cb_tests_);
-  EXPECT_GT(success, EXPECTED_SUCCESS_RATE * kinematics_test.num_ik_cb_tests_);
+  ROS_INFO_STREAM("Success Rate: " << (double)success / (kinematics_test.num_ik_cb_tests_ - removed_sample));
+  EXPECT_GT(success, EXPECTED_SUCCESS_RATE * (kinematics_test.num_ik_cb_tests_ - removed_sample));
   ROS_INFO_STREAM("Elapsed time: " << (ros::WallTime::now() - start_time).toSec());
 }
 
