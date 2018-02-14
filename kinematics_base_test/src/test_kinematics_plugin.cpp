@@ -64,6 +64,7 @@ const std::string NUM_IK_MULTIPLE_TESTS = "num_ik_multiple_tests";
 const std::string NUM_NEAREST_IK_TESTS = "num_nearest_ik_tests";
 const double DEFAULT_SEARCH_DISCRETIZATION = 0.01f;
 const double EXPECTED_SUCCESS_RATE = 0.8;
+const boost::uint32_t RANDOM_SEED {100};
 
 class KinematicsTest
 {
@@ -167,6 +168,10 @@ public:
   int num_ik_tests_;
   int num_ik_multiple_tests_;
   int num_nearest_ik_tests_;
+
+  // random generator
+  random_numbers::RandomNumberGenerator rng_{RANDOM_SEED};
+
 };
 
 KinematicsTest kinematics_test;
@@ -215,7 +220,7 @@ TEST(IKFastPlugin, getFK)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
-    kinematic_state.setToRandomPositions(joint_model_group);
+    kinematic_state.setToRandomPositions(joint_model_group, kinematics_test.rng_);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
@@ -256,7 +261,7 @@ TEST(IKFastPlugin, searchIK)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
-    kinematic_state.setToRandomPositions(joint_model_group);
+    kinematic_state.setToRandomPositions(joint_model_group, kinematics_test.rng_);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
@@ -329,7 +334,7 @@ TEST(IKFastPlugin, searchIKWithCallback)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
-    kinematic_state.setToRandomPositions(joint_model_group);
+    kinematic_state.setToRandomPositions(joint_model_group, kinematics_test.rng_);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
@@ -411,7 +416,7 @@ TEST(IKFastPlugin, getIK)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
-    kinematic_state.setToRandomPositions(joint_model_group);
+    kinematic_state.setToRandomPositions(joint_model_group, kinematics_test.rng_);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
@@ -481,7 +486,7 @@ TEST(IKFastPlugin, getIKMultipleSolutions)
   {
     seed.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
     fk_values.resize(kinematics_test.kinematics_solver_->getJointNames().size(), 0.0);
-    kinematic_state.setToRandomPositions(joint_model_group);
+    kinematic_state.setToRandomPositions(joint_model_group, kinematics_test.rng_);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
@@ -585,7 +590,7 @@ TEST(IKFastPlugin, getNearestIKSolution)
 
   for (unsigned int i = 0; i < kinematics_test.num_nearest_ik_tests_; ++i)
   {
-    kinematic_state.setToRandomPositions(joint_model_group);
+    kinematic_state.setToRandomPositions(joint_model_group, kinematics_test.rng_);
     kinematic_state.copyJointGroupPositions(joint_model_group, fk_values);
     std::vector<geometry_msgs::Pose> poses;
     poses.resize(1);
